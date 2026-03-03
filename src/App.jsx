@@ -14,7 +14,7 @@ function App() {
   const [isCartOpen, setIsCartOpen] = useState(false); // <-- estado para abrir/cerrar
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename='/Carrito-Compras-Tienda-Ross'>
       <div>
         {/* Barra de navegación */}
         <nav style={{ 
