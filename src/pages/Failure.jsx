@@ -6,7 +6,7 @@ function Failure() {
       <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>❌</div>
       <h1 style={{ color: '#d32f2f', marginBottom: '1rem' }}>Ups, algo salió mal</h1>
       <p style={{ marginBottom: '2rem', fontSize: '1.2rem' }}>
-        No se pudo completar el pago. Puede deberse a fondos insuficientes o datos incorrectos.
+        No se pudo completar el pago.
       </p>
       <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
         <Link 

@@ -6,10 +6,7 @@ function Pending() {
       <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⏳</div>
       <h1 style={{ color: '#ff9800', marginBottom: '1rem' }}>Pago pendiente</h1>
       <p style={{ marginBottom: '2rem', fontSize: '1.2rem' }}>
-        Estamos esperando la confirmación de tu pago. Te notificaremos por correo cuando se acredite.
-      </p>
-      <p style={{ marginBottom: '2rem', color: '#666' }}>
-        No cierres esta ventana mientras se procesa el pago.
+        Estamos esperando la confirmación de tu pago.
       </p>
       <Link 
         to="/productos" 
