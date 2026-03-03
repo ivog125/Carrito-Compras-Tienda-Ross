@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { getImageUrl } from '../utils/imageUtils';
 
 function ProductCard({ product }) {
   const { addToCart } = useCart();
@@ -8,7 +9,6 @@ function ProductCard({ product }) {
     e.preventDefault();
     e.stopPropagation();
     addToCart(product);
-    // Ya no mostramos alert, el toast se encarga
   };
 
   return (
@@ -32,10 +32,10 @@ function ProductCard({ product }) {
     }}
     >
       <img 
-        src={`${import.meta.env.BASE_URL}${product.image}`} 
+        src={getImageUrl(product.image)}
         alt={product.name}
         style={{ width: '100%', height: '200px', objectFit: 'cover' }}
-        onError={(e) => { e.target.src = '/placeholder.jpg' }}
+        onError={(e) => { e.target.src = getImageUrl('placeholder.jpg') }}
       />
       <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
         <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.1rem' }}>{product.name}</h3>

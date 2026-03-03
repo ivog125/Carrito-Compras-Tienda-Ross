@@ -8,6 +8,9 @@ import NotFound from './pages/NotFound';
 import CartDrawer from './components/CartDrawer';
 import Checkout from './pages/Checkout';
 import About from './pages/About';
+import Success from './pages/Success';
+import Failure from './pages/Failure';
+import Pending from './pages/Pending';
 
 function App() {
   const { getTotalItems } = useCart();
@@ -80,6 +83,9 @@ function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="*" element={<NotFound />} />
             <Route path="/about" element={<About />} />
+            <Route path="/success" element={<Success />} />
+            <Route path="/failure" element={<Failure />} />
+            <Route path="/pending" element={<Pending />} />
           </Routes>
         </main>
 

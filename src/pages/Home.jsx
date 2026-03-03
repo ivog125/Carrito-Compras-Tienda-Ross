@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { categories } from '../data/categories';
 import { products } from '../data/products';
-import ProductCard from '../components/ProductCard'; // Importamos el componente
+import ProductCard from '../components/ProductCard';
+import { getImageUrl } from '../utils/imageUtils';
 
 function Home() {
   const featuredProducts = products.slice(0, 3);
@@ -71,6 +72,14 @@ function Home() {
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >
+              {category.image && (
+                <img 
+                  src={getImageUrl(category.image)}
+                  alt={category.name}
+                  style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '4px', marginBottom: '1rem' }}
+                  onError={(e) => { e.target.style.display = 'none' }}
+                />
+              )}
               <h3 style={{ color: '#2e7d32', marginBottom: '0.5rem' }}>{category.name}</h3>
               <p style={{ fontSize: '0.9rem', color: '#666' }}>{category.description}</p>
             </Link>

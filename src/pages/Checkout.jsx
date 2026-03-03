@@ -1,236 +1,142 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { Wallet } from '@mercadopago/sdk-react';
+import axios from 'axios';
 
 function Checkout() {
-  const { cart, getTotalPrice, clearCart } = useCart();
-  const navigate = useNavigate();
+  const { cart, getTotalPrice } = useCart();
+  const [preferenceId, setPreferenceId] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
     telefono: '',
-    direccion: '',
-    ciudad: '',
-    notas: ''
+    direccion: ''
   });
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [orderCompleted, setOrderCompleted] = useState(false);
 
-  // Si el carrito está vacío, redirigir a productos
-  if (cart.length === 0 && !orderCompleted) {
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const crearPreferencia = async () => {
+    if (!formData.email) {
+      alert('Por favor ingresa tu email');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(`${API_URL}/api/create-preference`, {
+        items: cart.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        })),
+        payerEmail: formData.email
+      });
+      setPreferenceId(response.data.preferenceId);
+    } catch (error) {
+      console.error('Error creando preferencia:', error);
+      alert('Error al iniciar el pago. Intenta nuevamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (cart.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '3rem' }}>
         <h2>Tu carrito está vacío</h2>
-        <Link to="/productos" style={{ color: '#2e7d32' }}>Ir a comprar</Link>
-      </div>
-    );
-  }
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsProcessing(true);
-
-    // Simular proceso de pago/confirmación
-    setTimeout(() => {
-      setIsProcessing(false);
-      setOrderCompleted(true);
-      clearCart(); // Vaciar carrito después de la compra
-    }, 2000);
-  };
-
-  if (orderCompleted) {
-    return (
-      <div style={{ maxWidth: '600px', margin: '2rem auto', textAlign: 'center', padding: '2rem' }}>
-        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
-        <h2 style={{ color: '#2e7d32', marginBottom: '1rem' }}>¡Gracias por tu compra!</h2>
-        <p style={{ marginBottom: '2rem' }}>Tu pedido ha sido procesado exitosamente.</p>
-        <Link
-          to="/productos"
-          style={{
-            padding: '0.75rem 2rem',
-            backgroundColor: '#2e7d32',
-            color: 'white',
-            textDecoration: 'none',
-            borderRadius: '4px'
-          }}
-        >
-          Seguir comprando
-        </Link>
+        <a href="/productos" style={{ color: '#2e7d32' }}>Ir a comprar</a>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <h1 style={{ marginBottom: '2rem' }}>Finalizar compra</h1>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
+      <h1 style={{ color: '#2e7d32' }}>Finalizar compra</h1>
+      
+      {/* Formulario de datos del comprador */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h3>Datos de contacto</h3>
+        <input
+          type="text"
+          name="nombre"
+          placeholder="Nombre completo"
+          value={formData.nombre}
+          onChange={handleInputChange}
+          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleInputChange}
+          required
+          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+        />
+        <input
+          type="tel"
+          name="telefono"
+          placeholder="Teléfono"
+          value={formData.telefono}
+          onChange={handleInputChange}
+          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+        />
+        <input
+          type="text"
+          name="direccion"
+          placeholder="Dirección"
+          value={formData.direccion}
+          onChange={handleInputChange}
+          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+        />
+      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-        {/* Formulario de datos */}
-        <div>
-          <h2 style={{ marginBottom: '1.5rem' }}>Datos de envío</h2>
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>Nombre completo *</label>
-              <input
-                type="text"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleInputChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>Email *</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>Teléfono *</label>
-              <input
-                type="tel"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleInputChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>Dirección *</label>
-              <input
-                type="text"
-                name="direccion"
-                value={formData.direccion}
-                onChange={handleInputChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>Ciudad *</label>
-              <input
-                type="text"
-                name="ciudad"
-                value={formData.ciudad}
-                onChange={handleInputChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>Notas adicionales</label>
-              <textarea
-                name="notas"
-                value={formData.notas}
-                onChange={handleInputChange}
-                rows="4"
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isProcessing}
-              style={{
-                width: '100%',
-                padding: '1rem',
-                backgroundColor: isProcessing ? '#ccc' : '#2e7d32',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '1.1rem',
-                cursor: isProcessing ? 'not-allowed' : 'pointer'
-              }}
-            >
-              {isProcessing ? 'Procesando...' : 'Confirmar compra'}
-            </button>
-          </form>
-        </div>
-
-        {/* Resumen del pedido */}
-        <div>
-          <h2 style={{ marginBottom: '1.5rem' }}>Resumen del pedido</h2>
-          <div style={{
-            backgroundColor: '#f9f9f9',
-            padding: '1.5rem',
-            borderRadius: '8px'
-          }}>
-            {cart.map(item => (
-              <div key={item.id} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '1rem',
-                paddingBottom: '1rem',
-                borderBottom: '1px solid #ddd'
-              }}>
-                <div>
-                  <span style={{ fontWeight: 'bold' }}>{item.name}</span>
-                  <span style={{ color: '#666', marginLeft: '0.5rem' }}>x{item.quantity}</span>
-                </div>
-                <span>${(item.price * item.quantity).toLocaleString('es-CO')}</span>
-              </div>
-            ))}
-
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: '1rem',
-              fontSize: '1.2rem',
-              fontWeight: 'bold'
-            }}>
-              <span>Total:</span>
-              <span style={{ color: '#2e7d32' }}>${getTotalPrice().toLocaleString('es-CO')}</span>
-            </div>
+      {/* Resumen del pedido */}
+      <div style={{ backgroundColor: '#f5f5f5', padding: '1rem', borderRadius: '8px', marginBottom: '2rem' }}>
+        <h3>Resumen de tu compra</h3>
+        {cart.map(item => (
+          <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0' }}>
+            <span>{item.name} x{item.quantity}</span>
+            <span>${(item.price * item.quantity).toLocaleString('es-CO')}</span>
           </div>
+        ))}
+        <hr />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+          <span>Total:</span>
+          <span style={{ color: '#2e7d32' }}>${getTotalPrice().toLocaleString('es-CO')}</span>
         </div>
       </div>
+
+      {/* Botón para crear preferencia y pagar */}
+      {!preferenceId ? (
+        <button
+          onClick={crearPreferencia}
+          disabled={loading || !formData.email}
+          style={{
+            width: '100%',
+            padding: '1rem',
+            backgroundColor: '#2e7d32',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            fontSize: '1.2rem',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.7 : 1
+          }}
+        >
+          {loading ? 'Procesando...' : 'Continuar al pago'}
+        </button>
+      ) : (
+        <div style={{ marginTop: '2rem' }}>
+          <Wallet initialization={{ preferenceId }} />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,13 +1,14 @@
 import { useParams, Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 import { getProductById } from '../data/products';
 import { getCategoryById } from '../data/categories';
-import { useCart } from '../context/CartContext'; // <-- import agregado
+import { getImageUrl } from '../utils/imageUtils';
 
 function ProductDetail() {
   const { id } = useParams();
   const product = getProductById(id);
   const category = product ? getCategoryById(product.category) : null;
-  const { addToCart } = useCart(); // <-- hook agregado
+  const { addToCart } = useCart();
 
   if (!product) {
     return (
@@ -33,10 +34,10 @@ function ProductDetail() {
         {/* Imagen */}
         <div>
           <img 
-            src={`${import.meta.env.BASE_URL}${product.image}`}
+            src={getImageUrl(product.image)}
             alt={product.name}
             style={{ width: '100%', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-            onError={(e) => { e.target.src = '/placeholder.jpg' }}
+            onError={(e) => { e.target.src = getImageUrl('placeholder.jpg') }}
           />
         </div>
 
@@ -84,7 +85,7 @@ function ProductDetail() {
             </div>
           )}
 
-          {/* Botón de agregar al carrito (ahora funcional) */}
+          {/* Botón de agregar al carrito */}
           <button 
             onClick={() => addToCart(product)}
             style={{
