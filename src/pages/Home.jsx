@@ -4,7 +4,6 @@ import { products } from '../data/products';
 import ProductCard from '../components/ProductCard'; // Importamos el componente
 
 function Home() {
-  // Tomamos algunos productos destacados (por ejemplo, los primeros 3)
   const featuredProducts = products.slice(0, 3);
 
   return (
