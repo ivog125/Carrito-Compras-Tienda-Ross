@@ -33,10 +33,10 @@ function ProductDetail() {
         {/* Imagen */}
         <div>
           <img 
-            src={`/${product.image}`}  // <-- error corregido
+            src={`${import.meta.env.BASE_URL}${product.image}`}
             alt={product.name}
             style={{ width: '100%', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-            onError={(e) => { e.target.src = '/placeholder.jpg' }} // si tienes placeholder en public
+            onError={(e) => { e.target.src = '/placeholder.jpg' }}
           />
         </div>
 

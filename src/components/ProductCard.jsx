@@ -32,7 +32,7 @@ function ProductCard({ product }) {
     }}
     >
       <img 
-        src={`/${product.image}`} 
+        src={`${import.meta.env.BASE_URL}${product.image}`} 
         alt={product.name}
         style={{ width: '100%', height: '200px', objectFit: 'cover' }}
         onError={(e) => { e.target.src = '/placeholder.jpg' }}
